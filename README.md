@@ -1,23 +1,24 @@
-# Locus Desktop
+# Locus — Advanced Mathematical Visualization & Computational Engine
 
-A desktop mathematical visualization engine built with CustomTkinter, Matplotlib, SymPy, and NumPy.
+Desktop edition using CustomTkinter, SymPy, NumPy, and Matplotlib.
 
-## Quick start
+## Install
 
 ```bash
 pip install customtkinter matplotlib sympy numpy scipy
+```
+
+## Run
+
+```bash
 python main.py
 ```
 
-## Current MVP capabilities
+## Implemented in this revision
 
-- Enter equations like `y=x^2+3x` or `x^2+3x`
-- Parse with implicit multiplication and `^` power support
-- Plot 2D graphs in an embedded Matplotlib canvas
-- Run basic symbolic analysis (derivative, roots, critical points)
-
-## Project structure
-
-- `ui/`: desktop layout and components
-- `math_engine/`: parsing, analysis, calculus, and conic helpers
-- `graphing/`: rendering and sampling modules
+- Dark-themed desktop shell with sidebar + graph panel.
+- Equation plotting with zoom/pan toolbar.
+- Symbolic parser with implicit multiplication and caret power support.
+- Analysis panel with derivative, second derivative, roots, critical points, integral, and domain summary.
+- Graph actions for base plot, derivative overlay, and integral area shading.
+- Expanded module structure toward algebra/trigonometry/numerical/symbolic separation.
