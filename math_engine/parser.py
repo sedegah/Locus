@@ -6,8 +6,7 @@ from sympy.parsing.sympy_parser import (
     standard_transformations,
 )
 
-x = symbols("x")
-
+x_sym, y_sym = symbols("x y")
 
 TRANSFORMS = standard_transformations + (
     implicit_multiplication_application,
@@ -15,65 +14,32 @@ TRANSFORMS = standard_transformations + (
 )
 
 
-def _is_circle_equation(expr_str: str) -> bool:
-    """Check if equation represents a circle"""
-    # Look for patterns like (x-h)^2 + (y-k)^2 = r^2
-    # Check if it contains both x^2 and y^2 terms
-    has_x2 = 'x**2' in expr_str or 'x^2' in expr_str
-    has_y2 = 'y**2' in expr_str or 'y^2' in expr_str
-    
-    # Also check for LaTeX fraction format
-    has_frac = 'frac{' in expr_str or '}' in expr_str
-    has_both_vars = ('x' in expr_str and 'y' in expr_str)
-    
-    print(f"DEBUG Circle Check: expr_str={expr_str}, has_x2={has_x2}, has_y2={has_y2}, has_frac={has_frac}, has_both_vars={has_both_vars}")
-    
-    # Consider it a circle if it has both variables and either squared terms or fractions
-    is_circle = has_both_vars and (has_x2 or has_y2 or has_frac)
-    
-    return is_circle
-
-
 def parse_user_equation(equation: str) -> Expr:
-    normalized = equation.strip()
-    
-    # Handle circle equations - they contain both x and y
-    if 'y' in normalized and 'x' in normalized and ('**2' in normalized or '^2' in normalized):
-        # This is likely a circle equation, return as-is for special handling
-        return normalized
-    
-    # Handle implicit equations like "19y=2x^2-92x+20"
-    if '=' in equation_str and not equation_str.startswith('y='):
-        # This is likely an implicit equation that needs rearranging
-        try:
-            # Try to solve for y in terms of x
-            from sympy import solve, Eq
-            x, y = symbols('x y')
-            
-            # Parse the equation
-            eq = Eq(eval(equation_str.replace('=', '==')))
-            
-            # Try to solve for y
-            solution = solve(eq, y)
-            
-            if solution:
-                # Return the solved expression for y
-                return solution[0]
-            else:
-                # If solving fails, try to parse as-is
-                return sympify(equation_str.replace('=', '=='))
-        except Exception as e:
-            print(f"DEBUG: Implicit equation solving failed: {e}")
-            # If solving fails, try to parse as-is
-            return sympify(equation_str.replace('=', '=='))
-    
-    if normalized.startswith("y="):
-        normalized = normalized[2:]
+    """Parse user input equation string into a SymPy expression.
 
+    Handles:
+    - Explicit equations: "y = x^3 - 3x + 1" -> x**3 - 3*x + 1
+    - Plain expressions: "x^3 - 3x^2 + 9" -> x**3 - 3*x**2 + 9
+    - Implicit equations: "x^2 + y^2 = 25" -> x**2 + y**2 - 25
+    """
+    normalized = equation.strip()
     if not normalized:
         raise ValueError("Please enter an equation.")
 
-    # Replace ^ with ** for exponentiation
-    normalized = normalized.replace('^', '**')
+    # Remove leading 'y=' or 'y =' if y is purely on LHS
+    if "=" in normalized:
+        parts = normalized.split("=", 1)
+        lhs_str, rhs_str = parts[0].strip(), parts[1].strip()
+        if lhs_str.lower() == "y" and "y" not in rhs_str.lower():
+            normalized = rhs_str
 
-    return parse_expr(normalized, transformations=TRANSFORMS, local_dict={"x": x})
+    # Handle remaining equation with '=' (e.g. x^2 + y^2 = 25 or 2y = x^2 + 1)
+    if "=" in normalized:
+        parts = normalized.split("=", 1)
+        lhs_str, rhs_str = parts[0].strip(), parts[1].strip()
+        lhs_expr = parse_expr(lhs_str, transformations=TRANSFORMS, local_dict={"x": x_sym, "y": y_sym})
+        rhs_expr = parse_expr(rhs_str, transformations=TRANSFORMS, local_dict={"x": x_sym, "y": y_sym})
+        return lhs_expr - rhs_expr
+
+    return parse_expr(normalized, transformations=TRANSFORMS, local_dict={"x": x_sym, "y": y_sym})
+

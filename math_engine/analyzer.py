@@ -12,9 +12,11 @@ x = symbols("x")
 
 
 def _create_math_image(math_text: str, fontsize=12) -> Image.Image:
-    """Create an image from LaTeX math text using matplotlib's mathtext"""
+    """Create an image from LaTeX math text using matplotlib's mathtext with dark theme."""
     fig, ax = plt.subplots(figsize=(8, 0.8), dpi=100)
-    ax.text(0.5, 0.5, f'${math_text}$', fontsize=fontsize, 
+    fig.patch.set_facecolor('#181B26')
+    ax.set_facecolor('#181B26')
+    ax.text(0.5, 0.5, f'${math_text}$', fontsize=fontsize, color='#FFC72C',
             ha='center', va='center', transform=ax.transAxes)
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
@@ -23,7 +25,7 @@ def _create_math_image(math_text: str, fontsize=12) -> Image.Image:
     # Save to bytes buffer
     buf = io.BytesIO()
     plt.savefig(buf, format='png', bbox_inches='tight', pad_inches=0.1, 
-                facecolor='white', edgecolor='none')
+                facecolor='#181B26', edgecolor='none')
     buf.seek(0)
     plt.close(fig)
     
