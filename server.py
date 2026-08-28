@@ -358,7 +358,7 @@ def run_server(port: int = 8080):
     os.makedirs(WEB_DIR, exist_ok=True)
     server_address = ("0.0.0.0", port)
     httpd = ThreadingHTTPServer(server_address, LocusRequestHandler)
-    print(f"✨ Locus Math Web Engine running at http://0.0.0.0:{port}")
+    print(f"Locus Math Web Engine running at http://0.0.0.0:{port}")
     httpd.serve_forever()
 
 
