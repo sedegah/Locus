@@ -20,6 +20,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
+# Pre-configure noVNC root index.html to auto-connect with full canvas scaling
+RUN ln -sf /usr/share/novnc/vnc.html /usr/share/novnc/index.html || true
+
 WORKDIR /app
 
 # Copy requirements and install python packages
