@@ -4,7 +4,7 @@ FROM python:3.12-slim
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
 
-# Install system dependencies: Tkinter, Xvfb, VNC, noVNC web interface, and fonts
+# Install system dependencies: Tkinter, Xvfb, VNC, noVNC web interface, fonts, fontconfig
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-tk \
     tk-dev \
@@ -14,14 +14,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     fluxbox \
     novnc \
     websockify \
+    fontconfig \
     fonts-dejavu-core \
     fonts-freefont-ttf \
     ca-certificates \
     curl \
     && rm -rf /var/lib/apt/lists/*
-
-# Pre-configure noVNC root index.html to auto-connect with full canvas scaling
-RUN ln -sf /usr/share/novnc/vnc.html /usr/share/novnc/index.html || true
 
 WORKDIR /app
 
