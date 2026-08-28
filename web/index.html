@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Locus — Advanced Mathematical Visualization Engine</title>
+    
+    <!-- Google Fonts: IBM Plex Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- KaTeX for Mathematical Typesetting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+    <!-- Plotly.js for High Performance 2D & 3D WebGL Graphing -->
+    <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+
+    <!-- App Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <header class="brand-header">
+                <div class="brand-title">
+                    <span class="logo-text">LOCUS</span>
+                    <span class="logo-subtitle">Math Engine</span>
+                </div>
+                <div class="status-indicator">
+                    <span class="status-dot"></span>
+                    <span class="status-label">Ready</span>
+                </div>
+            </header>
+
+            <!-- Navigation Mode Tabs -->
+            <nav class="nav-tabs">
+                <button class="tab-btn active" data-tab="tab-2d">2D & Calc</button>
+                <button class="tab-btn" data-tab="tab-param">Param & Polar</button>
+                <button class="tab-btn" data-tab="tab-3d">3D & Vector</button>
+                <button class="tab-btn" data-tab="tab-presets">Presets</button>
+            </nav>
+
+            <!-- Tab Content Container -->
+            <div class="tab-content-container">
+                <!-- 1. 2D & Calculus Tab -->
+                <div id="tab-2d" class="tab-pane active">
+                    <div class="input-group">
+                        <label for="eq-2d">Function f(x):</label>
+                        <input type="text" id="eq-2d" class="math-input" value="y = x^3 - 3x^2 + x - 19" placeholder="e.g. y = x^3 - 3x + 1">
+                    </div>
+
+                    <!-- Virtual Math Keyboard -->
+                    <div class="math-keyboard">
+                        <button type="button" class="kb-btn" data-insert="x^2">x²</button>
+                        <button type="button" class="kb-btn" data-insert="x^3">x³</button>
+                        <button type="button" class="kb-btn" data-insert="sqrt(">√</button>
+                        <button type="button" class="kb-btn" data-insert="sin(">sin</button>
+                        <button type="button" class="kb-btn" data-insert="cos(">cos</button>
+                        <button type="button" class="kb-btn" data-insert="tan(">tan</button>
+                        <button type="button" class="kb-btn" data-insert="ln(">ln</button>
+                        <button type="button" class="kb-btn" data-insert="exp(">eˣ</button>
+                        <button type="button" class="kb-btn" data-insert="pi">π</button>
+                        <button type="button" class="kb-btn" data-insert="abs(">|x|</button>
+                        <button type="button" class="kb-btn" data-insert="/">÷</button>
+                        <button type="button" class="kb-btn" data-insert="*">×</button>
+                    </div>
+
+                    <!-- Action Grid -->
+                    <div class="action-grid">
+                        <button id="btn-plot-2d" class="btn btn-primary">Plot 2D</button>
+                        <button id="btn-analyze" class="btn btn-secondary">Analyze</button>
+                        <button id="btn-derivative" class="btn btn-secondary">Derivative</button>
+                        <button id="btn-integral" class="btn btn-secondary">Integral Area</button>
+                    </div>
+
+                    <!-- Riemann Sum Control Card -->
+                    <div class="control-card">
+                        <div class="card-header">
+                            <span>Riemann Rectangles (N):</span>
+                            <span id="riemann-n-val" class="badge">12</span>
+                        </div>
+                        <input type="range" id="riemann-slider" class="range-slider" min="1" max="100" value="12">
+                        <div class="card-actions">
+                            <select id="riemann-method" class="select-menu">
+                                <option value="midpoint">Midpoint</option>
+                                <option value="left">Left Sum</option>
+                                <option value="right">Right Sum</option>
+                            </select>
+                            <button id="btn-riemann" class="btn btn-accent-green">Riemann Sum</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Parametric & Polar Tab -->
+                <div id="tab-param" class="tab-pane">
+                    <div class="section-title">Parametric: x(t) & y(t)</div>
+                    <div class="input-group">
+                        <input type="text" id="param-x" class="math-input" value="cos(3*t)" placeholder="x(t) e.g. cos(3*t)">
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="param-y" class="math-input" value="sin(4*t)" placeholder="y(t) e.g. sin(4*t)">
+                    </div>
+                    <button id="btn-plot-param" class="btn btn-accent-magenta">Plot Parametric</button>
+
+                    <hr class="divider">
+
+                    <div class="section-title">Polar: r(θ)</div>
+                    <div class="input-group">
+                        <input type="text" id="polar-r" class="math-input" value="cos(4*theta)" placeholder="r(theta) e.g. cos(4*theta)">
+                    </div>
+                    <button id="btn-plot-polar" class="btn btn-accent-green">Plot Polar Graph</button>
+                </div>
+
+                <!-- 3. 3D Surface & Vector Tab -->
+                <div id="tab-3d" class="tab-pane">
+                    <div class="section-title">3D Surface: z = f(x, y)</div>
+                    <div class="input-group">
+                        <input type="text" id="surf-z" class="math-input" value="sin(sqrt(x^2 + y^2))" placeholder="z = f(x,y)">
+                    </div>
+                    <div class="control-row">
+                        <select id="colormap-select" class="select-menu">
+                            <option value="Viridis">Viridis</option>
+                            <option value="Plasma">Plasma</option>
+                            <option value="Warm">Coolwarm</option>
+                            <option value="Electric">Electric</option>
+                            <option value="Jet">Neon Jet</option>
+                        </select>
+                        <button id="btn-plot-3d" class="btn btn-primary">Plot 3D Surface</button>
+                    </div>
+
+                    <hr class="divider">
+
+                    <div class="section-title">Vector Field: dx/dt & dy/dt</div>
+                    <div class="input-group">
+                        <input type="text" id="vector-dx" class="math-input" value="y" placeholder="dx/dt e.g. y">
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="vector-dy" class="math-input" value="-x - 0.2*y" placeholder="dy/dt e.g. -x - 0.2*y">
+                    </div>
+                    <button id="btn-plot-vector" class="btn btn-accent-magenta">Plot Vector Field</button>
+                </div>
+
+                <!-- 4. Presets Tab -->
+                <div id="tab-presets" class="tab-pane">
+                    <div class="presets-grid">
+                        <button class="preset-card" data-preset="cubic">✦ Cubic Inflection</button>
+                        <button class="preset-card" data-preset="gaussian">✦ Gaussian Bell Curve</button>
+                        <button class="preset-card" data-preset="damped">✦ Damped Oscillator</button>
+                        <button class="preset-card" data-preset="butterfly">✦ Butterfly Polar Rose</button>
+                        <button class="preset-card" data-preset="saddle">✦ Hyperbolic Saddle 3D</button>
+                        <button class="preset-card" data-preset="sombrero">✦ Sombrero Wave 3D</button>
+                        <button class="preset-card" data-preset="spiral">✦ Limit Cycle Vector</button>
+                        <button class="preset-card" data-preset="circle">✦ Implicit Circle</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Symbolic Analysis Output Card -->
+            <div class="analysis-section">
+                <div class="section-heading">
+                    <span>Symbolic Analysis Output</span>
+                    <span id="analysis-spinner" class="spinner hidden"></span>
+                </div>
+                <div id="analysis-output" class="analysis-card">
+                    <p class="placeholder-text">Enter an equation and click 'Analyze' to view derivatives, integrals, roots, and domain analysis.</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Graph Panel -->
+        <main class="main-content">
+            <!-- Top Status Bar -->
+            <div class="graph-header">
+                <div id="equation-display" class="equation-badge">y = x³ - 3x² + x - 19</div>
+                <div class="graph-actions">
+                    <button id="btn-fullscreen" class="icon-btn" title="Toggle Fullscreen">⛶</button>
+                    <button id="btn-snapshot" class="icon-btn" title="Download High-Res PNG">📷</button>
+                </div>
+            </div>
+
+            <!-- Plotly Graph Canvas -->
+            <div id="graph-container" class="graph-container"></div>
+
+            <!-- Bottom Animation Toolbar -->
+            <footer class="animation-toolbar">
+                <div class="anim-controls">
+                    <button id="btn-anim-reset" class="ctrl-btn" title="Reset">⏹</button>
+                    <button id="btn-anim-step-bw" class="ctrl-btn" title="Step Back">⏮</button>
+                    <button id="btn-anim-play" class="btn-play">▶ Play</button>
+                    <button id="btn-anim-step-fw" class="ctrl-btn" title="Step Forward">⏭</button>
+                </div>
+
+                <div class="anim-scrubber-box">
+                    <input type="range" id="anim-scrubber" class="anim-slider" min="0" max="99" value="0">
+                    <span id="frame-counter" class="frame-label">Frame: 0/100</span>
+                </div>
+
+                <div class="anim-dropdowns">
+                    <select id="anim-speed" class="select-menu compact">
+                        <option value="0.25">0.25x</option>
+                        <option value="0.5">0.5x</option>
+                        <option value="1.0" selected>1.0x</option>
+                        <option value="2.0">2.0x</option>
+                        <option value="4.0">4.0x</option>
+                    </select>
+                    <select id="anim-mode" class="select-menu compact wide">
+                        <option value="trace">Trace Draw</option>
+                        <option value="tangent">Tangent Glide</option>
+                        <option value="riemann">Riemann Accumulator</option>
+                        <option value="sweep">Parameter Sweep</option>
+                    </select>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- App Logic -->
+    <script src="app.js"></script>
+</body>
+</html>
